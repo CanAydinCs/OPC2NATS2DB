@@ -17,7 +17,7 @@ func main() {
 }
 
 func connectAndReadOPCUAAndPublish(inputString string) {
-	opcServerURL := "opc.tcp://192.168.1.36:4840"
+	opcServerURL := "opc.tcp://192.168.56.1:4840"
 
 	// Connect to OPC UA server
 	ctx := context.Background()

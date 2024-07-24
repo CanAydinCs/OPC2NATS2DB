@@ -3,7 +3,7 @@ from random import randint
 import datetime
 import time
 server = Server()
-url = "opc.tcp://192.168.1.36:4840"
+url = "opc.tcp://192.168.56.1:4840"
 server.set_endpoint(url)
 
 name = "OPCUA_SIMULATION_SERVER"
