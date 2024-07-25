@@ -2,8 +2,12 @@ from opcua import Server
 from random import randint
 import datetime
 import time
+
+with open('my_config.txt', 'r') as file:
+    IP_ADRESS = file.readline().strip()
+
 server = Server()
-url = "opc.tcp://192.168.56.1:4840"
+url = "opc.tcp://" + str(IP_ADRESS) + ":4840"
 server.set_endpoint(url)
 
 name = "OPCUA_SIMULATION_SERVER"
