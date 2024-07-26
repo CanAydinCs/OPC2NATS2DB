@@ -14,32 +14,36 @@ import (
 	"github.com/gopcua/opcua/ua"
 )
 
-var OPC_IP_ADRESS string = ""
-var NATS_IP_ADRESS string = ""
-var NATS_SUBJECT string
+var OPC_IP_ADRESS string = "localhost"
+var NATS_IP_ADRESS string = nats.DefaultURL
+var NATS_SUBJECT string = "test.subject"
 var CONFIG_PATH string = "../my_config.txt"
 
 func main() {
 	fmt.Println("------------------------")
 	//configs
 	//OPC
-	OPC_IP_ADRESS, _ = readFirstLine(CONFIG_PATH)
+	var errOPCIP error
+	OPC_IP_ADRESS, errOPCIP = readNthLine(CONFIG_PATH, 1, OPC_IP_ADRESS)
+	if errOPCIP != nil {
+		fmt.Println("No IP config found for OPC, launching at local IP")
+	}
 	fmt.Println("Reading OPC IP adress at:", OPC_IP_ADRESS)
 	fmt.Println()
 
 	//NATS
-	var err error
-	NATS_IP_ADRESS, err = readSecondLine(CONFIG_PATH)
-	if err != nil {
-		fmt.Println("No url config found for NATS, launching at default url")
+	var errNATSIP error
+	NATS_IP_ADRESS, errNATSIP = readNthLine(CONFIG_PATH, 2, NATS_IP_ADRESS)
+	if errNATSIP != nil {
+		fmt.Println("No IP config found for NATS, launching at default IP")
 	}
 	fmt.Println("Publishing NATS Server at:", NATS_IP_ADRESS)
 	fmt.Println()
 
 	//NATS SUBJECT
-	var err2 error
-	NATS_SUBJECT, err2 = readThirdLine(CONFIG_PATH)
-	if err2 != nil {
+	var errNATSSUBJECT error
+	NATS_SUBJECT, errNATSSUBJECT = readNthLine(CONFIG_PATH, 3, NATS_SUBJECT)
+	if errNATSSUBJECT != nil {
 		fmt.Println("No subject has been found, set as default")
 	}
 	fmt.Println("NATS Server subject set as:", NATS_SUBJECT)
@@ -114,66 +118,19 @@ func connectAndReadOPCUAAndPublish(inputString string) {
 	fmt.Println("------------------------")
 }
 
-func readFirstLine(filename string) (string, error) {
+func readNthLine(filename string, lineNumber int, defaultValue string) (string, error) {
 	file, err := os.Open(filename)
 	if err != nil {
-		return "", err
+		return defaultValue, err
 	}
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-	if scanner.Scan() {
-		return scanner.Text(), nil
-	}
-
-	if err := scanner.Err(); err != nil {
-		return "", err
-	}
-
-	return "", err
-}
-
-func readSecondLine(filename string) (string, error) {
-	file, err := os.Open(filename) // Open the file specified by filename
-	if err != nil {
-		return "", err // Return an error if there was a problem opening the file
-	}
-	defer file.Close() // Ensure the file will be closed when the function completes
-
-	scanner := bufio.NewScanner(file) // Create a new scanner for the file
 	lineCount := 0
 	for scanner.Scan() {
 		lineCount++
-		// If we've read the first line, continue and read second line
-		if lineCount == 2 {
-			IP := scanner.Text() // Return the second line's text
-			if IP != "" {
-				return IP, nil
-			}
-		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		return "", err // Return an error if there was a problem scanning the file
-	}
-
-	return nats.DefaultURL, fmt.Errorf("file does not have a second line")
-}
-
-func readThirdLine(filename string) (string, error) {
-	file, err := os.Open(filename) // Open the file specified by filename
-	if err != nil {
-		return "", err // Return an error if there was a problem opening the file
-	}
-	defer file.Close() // Ensure the file will be closed when the function completes
-
-	scanner := bufio.NewScanner(file) // Create a new scanner for the file
-	lineCount := 0
-	for scanner.Scan() {
-		lineCount++
-		// If we've read the first two lines, continue and read third line
-		if lineCount == 3 {
-			subject := scanner.Text() // Return the third line's text
+		if lineCount == lineNumber {
+			subject := scanner.Text()
 			if subject != "" {
 				return subject, nil
 			}
@@ -184,5 +141,6 @@ func readThirdLine(filename string) (string, error) {
 		return "", err // Return an error if there was a problem scanning the file
 	}
 
-	return "test.subject", fmt.Errorf("file does not have a third line")
+	// Return the default value if the requested line does not exist
+	return defaultValue, fmt.Errorf("line %d does not exist", lineNumber)
 }

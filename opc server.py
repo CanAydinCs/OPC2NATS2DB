@@ -3,8 +3,12 @@ from random import randint
 import datetime
 import time
 
+IP_ADRESS = "localhost"
+
 with open('my_config.txt', 'r') as file:
-    IP_ADRESS = file.readline().strip()
+    ip = file.readline().strip()
+    if ip != "":
+          IP_ADRESS = ip
 
 server = Server()
 url = "opc.tcp://" + str(IP_ADRESS) + ":4840"
