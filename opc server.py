@@ -5,10 +5,13 @@ import time
 
 IP_ADRESS = "localhost"
 
-with open('my_config.txt', 'r') as file:
-    ip = file.readline().strip()
-    if ip != "":
-          IP_ADRESS = ip
+try:
+    with open('my_config.txt', 'r') as file:
+        ip = file.readline().strip()
+        if ip != "":
+            IP_ADRESS = ip
+except FileNotFoundError:
+    print("No IP config found for OPC, launching at local IP")
 
 server = Server()
 url = "opc.tcp://" + str(IP_ADRESS) + ":4840"
