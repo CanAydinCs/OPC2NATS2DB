@@ -186,7 +186,7 @@ func createDatabaseIfNotExists(db *sql.DB) error {
 			pressure TEXT,
 			created_at TIMESTAMPTZ DEFAULT NOW()
 		);
-	`)
+	`) // TODO: fix typo "temp"
 	return err
 }
 

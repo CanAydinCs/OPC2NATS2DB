@@ -3,15 +3,8 @@ from random import randint
 import datetime
 import time
 
-IP_ADRESS = "localhost"
-
-try:
-    with open('my_config.txt', 'r') as file:
-        ip = file.readline().strip()
-        if ip != "":
-            IP_ADRESS = ip
-except FileNotFoundError:
-    print("No IP config found for OPC, launching at local IP")
+# start on local
+IP_ADRESS = "0.0.0.0"
 
 server = Server()
 url = "opc.tcp://" + str(IP_ADRESS) + ":4840"

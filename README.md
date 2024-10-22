@@ -2,6 +2,8 @@
 
 Welcome to the OPC2NATS2DB project! This repository contains a pipeline designed to streamline the process of organizing data produced by automated systems, sending it to a NATS queue, and subsequently saving it to a database.
 
+![Alt text](sekil.png)
+
 ## Prerequisites
 Before starting, create a configuration file named `my_config.txt` in the main folder. Note that certain parts of the code can function with an empty or missing config file, as default values are provided. If not specified otherwise, the default values should suffice for most configurations.
 
